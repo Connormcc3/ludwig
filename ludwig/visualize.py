@@ -33,12 +33,12 @@ from ludwig.callbacks import Callback
 from ludwig.constants import *
 from ludwig.contrib import add_contrib_callback_args
 from ludwig.utils import visualization_utils
-from ludwig.utils.data_utils import load_from_file, load_json, load_array, \
-    to_numpy_dataset, unflatten_df, replace_file_extension
-from ludwig.utils.print_utils import logging_level_registry
 from ludwig.utils.data_utils import CACHEABLE_FORMATS, \
-    figure_data_format_dataset, external_data_reader_registry
+    figure_data_format_dataset, external_data_reader_registry, replace_file_extension
+from ludwig.utils.data_utils import load_from_file, load_json, load_array, \
+    to_numpy_dataset, unflatten_df, PANDAS_DF
 from ludwig.utils.misc_utils import get_from_registry
+from ludwig.utils.print_utils import logging_level_registry
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +206,7 @@ def _extract_ground_truth_values(
     )
 
     # retrieve ground truth from source data set
-    gt_df = reader(ground_truth)
+    gt_df = reader(ground_truth, PANDAS_DF)
 
     # extract ground truth for visualization
     if SPLIT in gt_df:
@@ -1231,9 +1231,9 @@ def calibration_1_vs_all_cli(
         ground_truth_split,
         split_file
     )
-    feature_metadata = metadata[output_feature_name]
-    vfunc = np.vectorize(_encode_categorical_feature)
-    ground_truth = vfunc(ground_truth, feature_metadata['str2idx'])
+
+    vfunc = np.vectorize(lambda x, y: x)
+    ground_truth = vfunc(ground_truth, {})
 
     col = f'{output_feature_name}{_PROBABILITIES_SUFFIX}'
     probabilities_per_model = _get_cols_from_predictions(
@@ -3590,7 +3590,7 @@ def calibration_1_vs_all(
             # class we are interested in, the input class index
 
             gt_class = (ground_truth == class_idx).astype(int)
-            prob_class = prob[:, class_idx]
+            prob_class = prob[:, class_idx][:len(ground_truth)]
 
             (
                 curr_fraction_positives,
