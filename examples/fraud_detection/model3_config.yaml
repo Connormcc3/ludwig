@@ -1,0 +1,100 @@
+input_features:
+    -
+        name: Time
+        type: numerical
+    -
+        name: V1
+        type: numerical
+    -
+        name: V2
+        type: numerical
+    -
+        name: V3
+        type: numerical
+    -
+        name: V4
+        type: numerical
+    -
+        name: V5
+        type: numerical
+    -
+        name: V6
+        type: numerical
+    -
+        name: V7
+        type: numerical
+    -
+        name: V8
+        type: numerical
+    -
+        name: V9
+        type: numerical
+    -
+        name: V10
+        type: numerical
+    -
+        name: V11
+        type: numerical
+    -
+        name: V12
+        type: numerical
+    -
+        name: V13
+        type: numerical
+    -
+        name: V14
+        type: numerical
+    -
+        name: V15
+        type: numerical
+    -
+        name: V16
+        type: numerical
+    -
+        name: V17
+        type: numerical
+    -
+        name: V18
+        type: numerical
+    -
+        name: V19
+        type: numerical
+    -
+        name: V20
+        type: numerical
+    -
+        name: V21
+        type: numerical
+    -
+        name: V22
+        type: numerical
+    -
+        name: V23
+        type: numerical
+    -
+        name: V24
+        type: numerical
+    -
+        name: V25
+        type: numerical
+    -
+        name: V26
+        type: numerical
+    -
+        name: V27
+        type: numerical
+    -
+        name: V28
+        type: numerical
+    -
+        name: Amount
+        type: numerical
+
+output_features:
+    -
+        name: Class
+        type: binary
+
+preprocessing:
+    -
+        oversample_minority: 0.5
