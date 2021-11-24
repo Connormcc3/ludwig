@@ -33,11 +33,15 @@ default_random_seed = 42
 default_preprocessing_force_split = False
 default_preprocessing_split_probabilities = (0.7, 0.1, 0.2)
 default_preprocessing_stratify = None
+default_preprocessing_undersample_majority = None
+default_preprocessing_oversample_minority = None
 
 default_preprocessing_parameters = {
     'force_split': default_preprocessing_force_split,
     'split_probabilities': default_preprocessing_split_probabilities,
-    'stratify': default_preprocessing_stratify
+    'stratify': default_preprocessing_stratify,
+    'undersample_majority': default_preprocessing_undersample_majority,
+    'oversample_minority': default_preprocessing_oversample_minority
 }
 default_preprocessing_parameters.update({
     name: base_type.preprocessing_defaults for name, base_type in
@@ -176,6 +180,15 @@ def _perform_sanity_checks(config):
         )
 
 
+def _set_output_flag(config: dict) -> None:
+    for feature in config['input_features']:
+        if OUTPUT_FLAG not in feature:
+            feature[OUTPUT_FLAG] = False
+    for feature in config['output_features']:
+        if OUTPUT_FLAG not in feature:
+            feature[OUTPUT_FLAG] = True
+
+
 def _set_feature_column(config: dict) -> None:
     for feature in config['input_features'] + config['output_features']:
         if COLUMN not in feature:
@@ -228,6 +241,7 @@ def _merge_hyperopt_with_training(config: dict) -> None:
 def merge_with_defaults(config):
     config = copy.deepcopy(config)
     _perform_sanity_checks(config)
+    _set_output_flag(config)
     _set_feature_column(config)
     _set_proc_column(config)
     _merge_hyperopt_with_training(config)
