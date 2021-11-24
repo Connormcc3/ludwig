@@ -1098,7 +1098,7 @@ def build_dataset(
     )
 
     if global_preprocessing_parameters['undersample_majority'] is not None \
-            and global_preprocessing_parameters['oversample_minority']:
+            or global_preprocessing_parameters['oversample_minority'] is not None:
         logger.debug("balancing data")
         proc_cols, total_df = balance_data(
             dataset_df,
@@ -1108,18 +1108,31 @@ def build_dataset(
             backend,
             skip_save_processed_input
         )
-
-    logger.debug("get split")
-    split = get_split(
-        total_df,
-        force_split=global_preprocessing_parameters['force_split'],
-        split_probabilities=global_preprocessing_parameters[
-            'split_probabilities'
-        ],
-        stratify=global_preprocessing_parameters['stratify'],
-        backend=backend,
-        random_seed=random_seed
-    )
+        
+        logger.debug("get split")
+        split = get_split(
+            total_df,
+            force_split=global_preprocessing_parameters['force_split'],
+            split_probabilities=global_preprocessing_parameters[
+                'split_probabilities'
+            ],
+            stratify=global_preprocessing_parameters['stratify'],
+            backend=backend,
+            random_seed=random_seed
+        )
+    else:
+        logger.debug("get split")
+        split = get_split(
+            dataset_df,
+            force_split=global_preprocessing_parameters['force_split'],
+            split_probabilities=global_preprocessing_parameters[
+                'split_probabilities'
+            ],
+            stratify=global_preprocessing_parameters['stratify'],
+            backend=backend,
+            random_seed=random_seed
+        )
+    
     if split is not None:
         proc_cols[SPLIT] = split
 
@@ -1282,6 +1295,7 @@ def balance_data(
         backend,
         skip_save_processed_input
 ):
+    
     proc_cols = {}
 
     for feature in features:
@@ -1295,14 +1309,14 @@ def balance_data(
     minority_df = df[df[target] == minority_class]
 
     if preprocessing_parameters['oversample_minority']:
-        sample_size = (len(majority_df) * preprocessing_parameters['oversample_minority']) - len(minority_df)
+        sample_size = int((len(majority_df) * preprocessing_parameters['oversample_minority']) - len(minority_df))
         minority_df = pd.concat([minority_df, minority_df.sample(n=sample_size, replace=True)])
     elif preprocessing_parameters['undersample_majority']:
-        sample_size = len(minority_df) / preprocessing_parameters['oversample_minority']
+        sample_size = int(len(minority_df) / preprocessing_parameters['undersample_majority'])
         majority_df = majority_df.sample(n=sample_size, replace=False)
 
     total_df = pd.concat([minority_df, majority_df])
-
+    
     for column in input_cols.keys():
         proc_cols[column] = total_df[column]
 

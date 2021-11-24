@@ -96,5 +96,4 @@ output_features:
         type: binary
 
 preprocessing:
-    -
-        undersample_majority: 0.5
+    undersample_majority: 0.5
